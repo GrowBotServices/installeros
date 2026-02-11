@@ -3,52 +3,138 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Denver Services - Revenue Generation Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<title>InstallerOS - Revenue Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script crossorigin src="https://unpkg.com/recharts@2.1.16/umd/Recharts.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone@7.24.0/babel.min.js"></script>
 <style>
+  :root {
+    --bg-primary: #08090c;
+    --bg-card: #0e1117;
+    --bg-card-hover: #141820;
+    --border: #1b1f2a;
+    --border-hover: #2a3040;
+    --text-primary: #e8eaf0;
+    --text-secondary: #8b90a0;
+    --text-muted: #4a4f60;
+    --accent: #00d4aa;
+    --accent-dim: rgba(0,212,170,0.12);
+    --accent-glow: rgba(0,212,170,0.25);
+    --warning: #f0b429;
+    --danger: #ef5350;
+    --info: #5c9cf5;
+    --purple: #a78bfa;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0a0a0a; font-family: system-ui, -apple-system, sans-serif; }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
-  @keyframes countUp { from { opacity:0; transform:scale(0.8) } to { opacity:1; transform:scale(1) } }
-  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.5 } }
-  @keyframes slideIn { from { opacity:0; transform:translateX(-10px) } to { opacity:1; transform:translateX(0) } }
+  body { background: var(--bg-primary); font-family: var(--font-body); color: var(--text-primary); }
+  
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+  @keyframes countUp { from { opacity:0; transform:scale(0.92) } to { opacity:1; transform:scale(1) } }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
+  @keyframes slideIn { from { opacity:0; transform:translateX(-8px) } to { opacity:1; transform:translateX(0) } }
   @keyframes spin { to { transform: rotate(360deg) } }
-  .fade-up { animation: fadeUp 0.6s ease-out forwards; opacity:0 }
-  .card { transition: all 0.3s ease }
-  .card:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(245,158,11,0.08) }
-  .row { transition: background 0.2s; cursor:pointer }
-  .row:hover { background:#1a1a1a !important }
-  .tbtn { transition:all 0.2s; cursor:pointer }
-  .tbtn:hover { background:#262626 !important }
+  @keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }
+  @keyframes borderGlow {
+    0%, 100% { border-color: var(--border); }
+    50% { border-color: rgba(0,212,170,0.15); }
+  }
+  
+  .fade-up { animation: fadeUp 0.5s ease-out forwards; opacity: 0; }
+  .card { transition: all 0.25s ease; border: 1px solid var(--border); }
+  .card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+  .row { transition: background 0.15s; cursor: pointer; }
+  .row:hover { background: var(--bg-card-hover) !important; }
+  .tbtn { transition: all 0.2s; cursor: pointer; border: none; font-family: var(--font-body); }
+  .tbtn:hover { background: var(--bg-card-hover) !important; }
+
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.3px;
+  }
+  .logo-mark span:first-child {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--accent) 0%, #00a885 100%);
+    border-radius: 7px;
+    color: #000;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+
+  .stat-label {
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: var(--font-mono);
+    margin-bottom: 4px;
+  }
+
+  .demo-ribbon {
+    position: fixed;
+    top: 16px;
+    right: -38px;
+    transform: rotate(45deg);
+    background: var(--accent);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 48px;
+    z-index: 999;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    box-shadow: 0 2px 12px var(--accent-glow);
+  }
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div class="demo-ribbon">DEMO</div>
+<div id="root"><div style="min-height:100vh;background:var(--bg-primary);display:flex;align-items:center;justify-content:center"><div style="text-align:center"><div style="width:40px;height:40px;border:2px solid #1b1f2a;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px"></div><p style="color:var(--text-muted);font-size:12px;font-family:var(--font-mono);letter-spacing:2px;text-transform:uppercase">Loading InstallerOS...</p></div></div></div>
 <script type="text/babel">
 const { useState, useEffect, useMemo, Fragment } = React;
 const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } = Recharts;
 
+// ─── DEMO CONFIG ──────────────────────────────────────────
+// Change these for different demo scenarios
+const DEMO_COMPANY = "Hartley Heating & Plumbing";
+const DEMO_AGENT_NAME = "Sophie";
+const DEMO_MONTHLY_COST = 1997;
+const DEMO_MODE = true; // Set false when connected to live API
+
+// ─── PRICE MAP (UK Trades Standard) ──────────────────────
 const PRICE_MAP = {
-  "Boiler Service": { min: 90, avg: 90 },
-  "Gas Safety Certificate": { min: 90, avg: 90 },
-  "BS & GSC Combined": { min: 126, avg: 126 },
-  "Oil Boiler Service": { min: 180, avg: 180 },
-  "LPG Boiler Service": { min: 90, avg: 90 },
-  "Cylinder Service": { min: 90, avg: 90 },
-  "ASHP Service": { min: 180, avg: 180 },
+  "Boiler Service": { min: 85, avg: 95 },
+  "Gas Safety Certificate": { min: 80, avg: 90 },
+  "BS & GSC Combined": { min: 120, avg: 130 },
+  "Oil Boiler Service": { min: 150, avg: 180 },
+  "LPG Boiler Service": { min: 85, avg: 95 },
+  "Cylinder Service": { min: 85, avg: 95 },
+  "ASHP Service": { min: 150, avg: 180 },
   "ASHP Breakdown": { min: 108, avg: 150 },
-  "WAU Service": { min: 120, avg: 120 },
+  "WAU Service": { min: 100, avg: 120 },
   "Boiler Breakdown": { min: 108, avg: 180 },
   "Plumbing Repair": { min: 108, avg: 160 },
   "Boiler Replacement Quote": { min: 2500, avg: 3250 },
   "Heat Pump Quote": { min: 3000, avg: 5000 },
   "Central Heating Issue": { min: 108, avg: 150 },
-  "Gas Fire Service": { min: 90, avg: 90 },
-  "Landlord GSC": { min: 96, avg: 102 },
-  "Landlord BS & GSC": { min: 126, avg: 132 },
+  "Gas Fire Service": { min: 85, avg: 95 },
+  "Landlord GSC": { min: 75, avg: 95 },
+  "Landlord BS & GSC": { min: 105, avg: 130 },
   "General Enquiry": { min: 90, avg: 120 },
 };
 
@@ -104,6 +190,88 @@ const inferCaptureType = (dateStr, callSource) => {
   return "overflow";
 };
 
+// ─── DEMO DATA GENERATOR ─────────────────────────────────
+const generateDemoData = () => {
+  const calls = [];
+  const now = new Date();
+  const jobs = ["Boiler Service","Boiler Service","Boiler Service","Boiler Service","Gas Safety Certificate","Gas Safety Certificate","Gas Safety Certificate","BS & GSC Combined","BS & GSC Combined","BS & GSC Combined","BS & GSC Combined","Boiler Breakdown","Boiler Breakdown","Boiler Breakdown","Plumbing Repair","Plumbing Repair","Plumbing Repair","ASHP Service","ASHP Service","Landlord BS & GSC","Landlord BS & GSC","Landlord BS & GSC","Landlord GSC","Landlord GSC","Boiler Replacement Quote","Boiler Replacement Quote","Heat Pump Quote","Central Heating Issue","Central Heating Issue","Oil Boiler Service","WAU Service","Cylinder Service","Gas Fire Service"];
+  const captureWeights = [["out-of-hours",0.28],["overflow",0.32],["reactivation",0.22],["speed-response",0.18]];
+  const firstNames = ["Sarah","James","Emma","David","Lucy","Tom","Claire","Mark","Helen","Paul","Rachel","Steve","Karen","Mike","Jane","Chris","Debbie","Andy","Fiona","Rob","Peter","Susan","Alan","Linda","Keith","Dawn","Graham","Wendy","Ian","Julie","Colin","Jean","Simon","Marie","Derek","Janet","Brian","Margaret","Stuart","Diane"];
+  const lastNames = ["Smith","Jones","Williams","Brown","Taylor","Davies","Wilson","Evans","Thomas","Roberts","Johnson","Walker","Wright","Robinson","Thompson","White","Hughes","Edwards","Green","Lewis","Wood","Harris","Martin","Jackson","Clarke","Price","Morgan","James","Morris","Lee"];
+  const postcodes = ["RH10","RH11","RH19","RH6","RH1","RH2","TN6","TN7","TN22","CR0","CR3","CR5","CR6","SE19","SE25","BR1","BR6","KT18","SM1","SM5"];
+  const descriptions = {
+    "Boiler Service": ["Annual boiler service due","Boiler service needed, last done 14 months ago","Regular service, Worcester boiler","Yearly check on Vaillant boiler","Boiler service, 8 year old Baxi"],
+    "Gas Safety Certificate": ["CP12 needed for rental property","Gas safety cert renewal","Annual gas safe check due","Gas certificate expired last month"],
+    "BS & GSC Combined": ["Service and certificate both due","Need both service and gas safety done","Annual service plus CP12 for landlord","Boiler service and safety check combined"],
+    "Boiler Breakdown": ["Boiler not firing up, no hot water","Boiler keeps cutting out, error code showing","No heating since last night","Boiler pressure dropping constantly","Boiler making banging noises, intermittent heating"],
+    "Plumbing Repair": ["Leak under kitchen sink, slow drip","Toilet cistern not filling properly","Shower mixer valve leaking","Outside tap dripping constantly","Overflow pipe running from loft"],
+    "ASHP Service": ["Air source heat pump annual service","Heat pump needs servicing, Mitsubishi unit","ASHP service due, installed 2 years ago"],
+    "Landlord BS & GSC": ["Landlord needs service and cert for tenant changeover","Letting agent requesting BS and GSC","Both needed before new tenancy starts"],
+    "Landlord GSC": ["CP12 renewal for rental flat","Letting agent needs gas safety certificate","Gas cert for buy to let property"],
+    "Boiler Replacement Quote": ["Boiler is 15 years old, want quote for new one","Looking to replace old back boiler","Want prices for a new combi boiler installation"],
+    "Heat Pump Quote": ["Interested in air source heat pump quote","Want to know about heat pump installation costs","Looking into renewable heating options"],
+    "Central Heating Issue": ["Some radiators not heating up, others fine","TRV stuck on one radiator","Thermostat not calling for heat properly"],
+    "Oil Boiler Service": ["Oil boiler annual service due","Grant Vortex needs servicing"],
+    "WAU Service": ["Warm air unit annual service","Johnson Starley warm air unit needs checking"],
+    "Cylinder Service": ["Megaflow cylinder needs servicing","Unvented hot water cylinder annual check"],
+    "Gas Fire Service": ["Gas fire not lighting properly, needs service","Annual gas fire check due"],
+    "General Enquiry": ["Wanted to discuss heating options","Called about availability for next week"],
+    "ASHP Breakdown": ["Heat pump showing error code, no heating","Air source unit not working since yesterday"],
+    "LPG Boiler Service": ["LPG boiler service needed, rural property"],
+  };
+
+  for (let d = 0; d < 28; d++) {
+    const numCalls = Math.floor(Math.random() * 5) + 2;
+    for (let c = 0; c < numCalls; c++) {
+      const dt = new Date(now);
+      dt.setDate(dt.getDate() - d);
+
+      let captureType;
+      let r = Math.random(), cumulative = 0;
+      for (const [t, w] of captureWeights) { cumulative += w; if (r <= cumulative) { captureType = t; break; } }
+
+      if (captureType === "out-of-hours") {
+        dt.setHours(Math.random() > 0.5 ? Math.floor(Math.random() * 3) + 18 : Math.floor(Math.random() * 2) + 6);
+        if (Math.random() > 0.55) {
+          const daysToSat = (6 - dt.getDay() + 7) % 7;
+          dt.setDate(dt.getDate() - (dt.getDay() === 0 ? 0 : daysToSat > 0 ? daysToSat : 0));
+          dt.setHours(Math.floor(Math.random() * 6) + 8);
+        }
+      } else {
+        dt.setHours(Math.floor(Math.random() * 9) + 8, Math.floor(Math.random() * 60));
+      }
+
+      const jobType = jobs[Math.floor(Math.random() * jobs.length)];
+      const price = PRICE_MAP[jobType];
+      const descs = descriptions[jobType] || descriptions["General Enquiry"];
+      const pc = postcodes[Math.floor(Math.random() * postcodes.length)];
+      const suffix = `${Math.floor(Math.random() * 9) + 1}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
+
+      const statusRoll = Math.random();
+      let status = "booked";
+      if (statusRoll > 0.82) status = "pending";
+      if (statusRoll > 0.94) status = "cancelled";
+
+      calls.push({
+        id: `demo-${d}-${c}`,
+        date: dt.toISOString(),
+        customerName: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
+        phone: `07${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900000 + 100000)}`,
+        postcode: `${pc} ${suffix}`,
+        description: descs[Math.floor(Math.random() * descs.length)],
+        boilerType: "",
+        callSource: "AI Voice Agent",
+        jobType,
+        captureType,
+        estimatedValue: price.min + Math.floor(Math.random() * (price.avg - price.min + 40)),
+        status,
+      });
+    }
+  }
+  return calls.sort((a, b) => new Date(b.date) - new Date(a.date));
+};
+
+// ─── LIVE DATA FETCHER (for connected deployments) ───────
 const fetchLiveData = async () => {
   const resp = await fetch("/api/monday");
   if (!resp.ok) throw new Error(`Server returned ${resp.status}`);
@@ -111,8 +279,8 @@ const fetchLiveData = async () => {
   if (data.error) throw new Error(data.error);
   if (!data?.data?.boards?.[0]?.items_page?.items) throw new Error("No board data");
   return data.data.boards[0].items_page.items.map((item) => {
-    const col = (id) => item.column_values.find((c) => c.id === id)?.text || "";
-    const colVal = (id) => { const raw = item.column_values.find((c) => c.id === id)?.value; if (!raw) return ""; try { return JSON.parse(raw); } catch { return raw; } };
+    const col = (id) => item.column_values?.find((c) => c.id === id)?.text || "";
+    const colVal = (id) => { const raw = item.column_values?.find((c) => c.id === id)?.value; if (!raw) return ""; try { return JSON.parse(raw); } catch { return raw; } };
     const description = col("long_text_mkyw56xd");
     const boilerType = col("dropdown_mkyw8ax3");
     const callSource = col("text_mkyw1az7");
@@ -131,48 +299,29 @@ const fetchLiveData = async () => {
   });
 };
 
-const generateSampleData = () => {
-  const calls = [];
-  const now = new Date();
-  const jobs = ["Boiler Service","Boiler Service","Boiler Service","Gas Safety Certificate","Gas Safety Certificate","BS & GSC Combined","BS & GSC Combined","BS & GSC Combined","Boiler Breakdown","Boiler Breakdown","Boiler Breakdown","Plumbing Repair","Plumbing Repair","ASHP Service","Landlord BS & GSC","Landlord BS & GSC","Landlord GSC","Boiler Replacement Quote","Heat Pump Quote","Central Heating Issue","Central Heating Issue","Oil Boiler Service","WAU Service","Cylinder Service"];
-  const cw = [["out-of-hours",0.3],["overflow",0.35],["reactivation",0.2],["speed-response",0.15]];
-  const fn = ["Sarah","James","Emma","David","Lucy","Tom","Claire","Mark","Helen","Paul","Rachel","Steve","Karen","Mike","Jane","Chris","Debbie","Andy","Fiona","Rob"];
-  const ln = ["Smith","Jones","Williams","Brown","Taylor","Davies","Wilson","Evans","Thomas","Roberts","Johnson","Walker","Wright","Robinson","Thompson"];
-  for (let d = 0; d < 28; d++) {
-    const n = Math.floor(Math.random() * 4) + 2;
-    for (let c = 0; c < n; c++) {
-      const dt = new Date(now); dt.setDate(dt.getDate() - d); dt.setHours(Math.floor(Math.random() * 14) + 7, Math.floor(Math.random() * 60), 0, 0);
-      let cap; let r = Math.random(); let cu = 0;
-      for (const [t, w] of cw) { cu += w; if (r <= cu) { cap = t; break; } }
-      if (cap === "out-of-hours") { dt.setHours(Math.random() > 0.5 ? Math.floor(Math.random() * 3) + 18 : 7); if (Math.random() > 0.6) dt.setDate(dt.getDate() - (dt.getDay() === 0 ? 0 : 6 - dt.getDay())); }
-      const jt = jobs[Math.floor(Math.random() * jobs.length)]; const p = PRICE_MAP[jt];
-      calls.push({ id: `s-${d}-${c}`, date: dt.toISOString(), customerName: `${fn[Math.floor(Math.random() * fn.length)]} ${ln[Math.floor(Math.random() * ln.length)]}`, jobType: jt, captureType: cap, estimatedValue: p.min + Math.floor(Math.random() * (p.avg - p.min + 30)), status: Math.random() > 0.15 ? "booked" : "pending", description: "", boilerType: "", callSource: "", phone: "", postcode: "" });
-    }
-  }
-  return calls.sort((a, b) => new Date(b.date) - new Date(a.date));
-};
-
+// ─── CONSTANTS ────────────────────────────────────────────
 const CAPTURE_LABELS = {
   "out-of-hours": { label: "Out of Hours", desc: "Evenings, weekends and bank holidays", icon: "\u{1F319}" },
   "overflow": { label: "Overflow", desc: "Office busy or staff unavailable", icon: "\u{1F4DE}" },
   "reactivation": { label: "Reactivation", desc: "Automated reminders to existing customers", icon: "\u{1F504}" },
   "speed-response": { label: "Instant Response", desc: "Answered before customer moved on", icon: "\u{26A1}" },
 };
-const PIE_COLORS = ["#f59e0b", "#ef4444", "#22c55e", "#3b82f6"];
-const INSTALLEROS_COST = 1997;
+const PIE_COLORS = ["var(--accent)", "var(--danger)", "var(--warning)", "var(--info)"];
+const PIE_HEX = ["#00d4aa", "#ef5350", "#f0b429", "#5c9cf5"];
 const fmt = (v) => "\u00A3" + v.toLocaleString("en-GB", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 const fmtD = (iso) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 const fmtT = (iso) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
 const CTip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
-  return React.createElement("div", { style: { background: "#1a1a1a", border: "1px solid #333", borderRadius: 8, padding: "10px 14px", fontSize: 13 } },
-    React.createElement("p", { style: { color: "#999", margin: 0, marginBottom: 4 } }, label),
-    payload.map((p, i) => React.createElement("p", { key: i, style: { color: p.color || "#f59e0b", margin: 0 } }, p.name, ": ", fmt(p.value)))
+  return React.createElement("div", { style: { background: "#141820", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 14px", fontSize: 13, fontFamily: "var(--font-body)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" } },
+    React.createElement("p", { style: { color: "var(--text-secondary)", margin: 0, marginBottom: 4, fontSize: 11 } }, label),
+    payload.map((p, i) => React.createElement("p", { key: i, style: { color: p.color || "var(--accent)", margin: 0, fontWeight: 500 } }, p.name, ": ", fmt(p.value)))
   );
 };
 
-function RevenueDashboard() {
+// ─── MAIN DASHBOARD COMPONENT ─────────────────────────────
+function Dashboard() {
   const [calls, setCalls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [src, setSrc] = useState("loading");
@@ -183,14 +332,20 @@ function RevenueDashboard() {
 
   useEffect(() => {
     (async () => {
+      if (DEMO_MODE) {
+        setCalls(generateDemoData());
+        setSrc("demo");
+        setLoading(false);
+        return;
+      }
       try {
         const d = await fetchLiveData();
         if (d && d.length > 0) { setCalls(d); setSrc("live"); }
-        else { setCalls(generateSampleData()); setSrc("sample"); setError("Board returned 0 items"); }
+        else { setCalls(generateDemoData()); setSrc("demo"); setError("No live data found"); }
       } catch (e) {
         console.error("Fetch failed:", e);
-        setCalls(generateSampleData());
-        setSrc("sample");
+        setCalls(generateDemoData());
+        setSrc("demo");
         setError(e.message);
       } finally { setLoading(false); }
     })();
@@ -218,137 +373,143 @@ function RevenueDashboard() {
     const wm = { "1week": 1, "2weeks": 0.5, "4weeks": 0.25 }[range] || 0.25;
     const wa = rev * wm; const mo = wa * 4.33; const yr = mo * 12;
     const rd = { "1week": 0.25, "2weeks": 0.5, "4weeks": 1 }[range] || 1;
-    const roi = rev / (INSTALLEROS_COST * rd);
+    const roi = rev / (DEMO_MONTHLY_COST * rd);
     return { rev, total, booked, rate: total > 0 ? ((booked / total) * 100).toFixed(1) : "0", byCap, byJob, daily: Object.values(daily).reverse(), mo, yr, roi, avg: total > 0 ? Math.round(rev / total) : 0 };
   }, [filtered, range]);
 
   const pieData = useMemo(() => Object.entries(stats.byCap).map(([k, v]) => ({ name: CAPTURE_LABELS[k].label, value: v.revenue, count: v.count })), [stats.byCap]);
-  const barData = useMemo(() => Object.entries(stats.byJob).sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 8).map(([n, d]) => ({ name: n.length > 20 ? n.slice(0, 18) + "..." : n, revenue: d.revenue, count: d.count })), [stats.byJob]);
+  const barData = useMemo(() => Object.entries(stats.byJob).sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 8).map(([n, d]) => ({ name: n.length > 22 ? n.slice(0, 20) + "..." : n, revenue: d.revenue, count: d.count })), [stats.byJob]);
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ width: 48, height: 48, border: "3px solid #222", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 20px" }} />
-          <p style={{ color: "#666", fontSize: 13, letterSpacing: 2, textTransform: "uppercase", fontFamily: "monospace" }}>Connecting to Monday.com...</p>
+          <div style={{ width: 40, height: 40, border: "2px solid var(--border)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
+          <p style={{ color: "var(--text-muted)", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", fontFamily: "var(--font-mono)" }}>Connecting...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#e5e5e5", fontFamily: "system-ui, -apple-system, sans-serif", padding: "0 0 60px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)", color: "var(--text-primary)", fontFamily: "var(--font-body)", padding: "0 0 60px" }}>
 
-      {/* HEADER */}
-      <div style={{ background: "linear-gradient(180deg,#111 0%,#0a0a0a 100%)", borderBottom: "1px solid #1a1a1a", padding: "24px 28px 20px" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+      {/* ─── HEADER ─── */}
+      <div style={{ background: "linear-gradient(180deg, #0d1018 0%, var(--bg-primary) 100%)", borderBottom: "1px solid var(--border)", padding: "20px 28px 18px" }}>
+        <div style={{ maxWidth: 1320, margin: "0 auto" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                <div style={{ width: 9, height: 9, borderRadius: "50%", background: src === "live" ? "#22c55e" : "#f59e0b", boxShadow: `0 0 8px ${src === "live" ? "rgba(34,197,94,0.5)" : "rgba(245,158,11,0.5)"}`, animation: "pulse 2s infinite" }} />
-                <span style={{ color: "#666", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", fontFamily: "monospace" }}>
-                  {src === "live" ? "Live \u00B7 Monday.com" : "Sample Data"} \u00B7 Denver Services
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
+                <div className="logo-mark">
+                  <span>iO</span>
+                  <span style={{ color: "var(--text-primary)" }}>InstallerOS</span>
+                </div>
+                <div style={{ width: 1, height: 18, background: "var(--border)" }} />
+                <span style={{ color: "var(--text-muted)", fontSize: 11, fontFamily: "var(--font-mono)", letterSpacing: 1 }}>
+                  REVENUE INTELLIGENCE
                 </span>
               </div>
-              <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: -0.5 }}>Revenue Generation Dashboard</h1>
-              <p style={{ color: "#555", fontSize: 13, margin: "4px 0 0", maxWidth: 500 }}>Additional revenue captured by InstallerOS channels.</p>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                <div style={{ width: 7, height: 7, borderRadius: "50%", background: src === "live" ? "var(--accent)" : "var(--warning)", boxShadow: `0 0 8px ${src === "live" ? "var(--accent-glow)" : "rgba(240,180,41,0.4)"}`, animation: "pulse 2s infinite" }} />
+                <span style={{ color: "var(--text-muted)", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: "var(--font-mono)" }}>
+                  {src === "live" ? "Live Data" : "Demo Mode"} · {DEMO_COMPANY}
+                </span>
+              </div>
+              <p style={{ color: "var(--text-muted)", fontSize: 12, margin: "4px 0 0", maxWidth: 520 }}>
+                Revenue captured by {DEMO_AGENT_NAME} that would have otherwise been lost to missed calls, out-of-hours enquiries and slow response times.
+              </p>
             </div>
-            <div style={{ display: "flex", gap: 4, background: "#111", borderRadius: 10, padding: 3, border: "1px solid #1a1a1a" }}>
-              {[{ key: "1week", label: "7 Days" }, { key: "2weeks", label: "14 Days" }, { key: "4weeks", label: "4 Weeks" }].map(({ key, label }) => (
-                <button key={key} className="tbtn" onClick={() => setRange(key)} style={{ padding: "7px 14px", borderRadius: 7, border: "none", background: range === key ? "#f59e0b" : "transparent", color: range === key ? "#000" : "#666", fontSize: 12, fontWeight: range === key ? 600 : 400, fontFamily: "system-ui, sans-serif" }}>{label}</button>
+            <div style={{ display: "flex", gap: 3, background: "var(--bg-card)", borderRadius: 10, padding: 3, border: "1px solid var(--border)" }}>
+              {[{ key: "1week", label: "7d" }, { key: "2weeks", label: "14d" }, { key: "4weeks", label: "28d" }].map(({ key, label }) => (
+                <button key={key} className="tbtn" onClick={() => setRange(key)} style={{ padding: "7px 16px", borderRadius: 7, background: range === key ? "var(--accent)" : "transparent", color: range === key ? "#000" : "var(--text-muted)", fontSize: 12, fontWeight: range === key ? 600 : 400 }}>{label}</button>
               ))}
             </div>
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 28px" }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto", padding: "0 28px" }}>
 
-        {error && (
-          <div className="fade-up" style={{ marginTop: 16, background: "#1a1a0f", border: "1px solid #2a2a1a", borderRadius: 10, padding: "12px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 16 }}>{"\u26A0\uFE0F"}</span>
-            <p style={{ margin: 0, color: "#f59e0b", fontSize: 12 }}><strong>Using sample data.</strong> {error}</p>
-          </div>
-        )}
-
-        {src === "live" && (
-          <div className="fade-up" style={{ marginTop: 16, background: "#0f1a0f", border: "1px solid #1a2a1a", borderRadius: 10, padding: "12px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 16 }}>{"\u2705"}</span>
-            <p style={{ margin: 0, color: "#6ee7b7", fontSize: 12 }}><strong>Connected to Monday.com.</strong> Showing {calls.length} items from your board.</p>
-          </div>
-        )}
-
-        {/* HERO */}
-        <div className="fade-up" style={{ marginTop: 16, background: "linear-gradient(135deg,#1a1207 0%,#111 50%,#0f1a0f 100%)", border: "1px solid #2a2a1a", borderRadius: 14, padding: "28px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
+        {/* ─── HERO METRICS ─── */}
+        <div className="fade-up" style={{ marginTop: 20, background: "linear-gradient(135deg, rgba(0,212,170,0.04) 0%, var(--bg-card) 40%, rgba(90,100,180,0.03) 100%)", border: "1px solid var(--border)", borderRadius: 14, padding: "28px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
           <div>
-            <p style={{ color: "#888", margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "monospace", fontSize: 10 }}>Total Revenue Captured</p>
-            <div style={{ fontSize: 48, fontWeight: 700, color: "#f59e0b", letterSpacing: -2, lineHeight: 1, animation: "countUp 0.8s ease-out" }}>{fmt(stats.rev)}</div>
-            <p style={{ color: "#555", fontSize: 13, margin: "8px 0 0" }}>From {stats.total} calls \u00B7 {stats.rate}% booked \u00B7 {fmt(stats.avg)} avg value</p>
+            <p className="stat-label">Total Revenue Captured</p>
+            <div style={{ fontSize: 48, fontWeight: 700, color: "var(--accent)", letterSpacing: -2, lineHeight: 1, animation: "countUp 0.8s ease-out", fontFamily: "var(--font-body)" }}>{fmt(stats.rev)}</div>
+            <p style={{ color: "var(--text-muted)", fontSize: 12, margin: "10px 0 0", fontFamily: "var(--font-mono)", letterSpacing: 0.5 }}>
+              {stats.total} calls · {stats.rate}% booked · {fmt(stats.avg)} avg
+            </p>
           </div>
-          <div style={{ display: "flex", gap: 28, flexWrap: "wrap" }}>
-            {[{ l: "Monthly Projection", v: fmt(stats.mo), c: "#fff" }, { l: "Annual Projection", v: fmt(stats.yr), c: "#fff" }, { l: "ROI vs Cost", v: `${stats.roi.toFixed(1)}x`, c: "#22c55e" }].map(s => (
+          <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+            {[
+              { l: "Monthly", v: fmt(stats.mo), c: "var(--text-primary)" },
+              { l: "Annual", v: fmt(stats.yr), c: "var(--text-primary)" },
+              { l: "ROI", v: `${stats.roi.toFixed(1)}x`, c: "var(--accent)" }
+            ].map(s => (
               <div key={s.l} style={{ textAlign: "right" }}>
-                <p style={{ color: "#666", fontSize: 10, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace" }}>{s.l}</p>
-                <p style={{ color: s.c, fontSize: 22, fontWeight: 600, margin: 0 }}>{s.v}</p>
+                <p className="stat-label">{s.l}</p>
+                <p style={{ color: s.c, fontSize: 24, fontWeight: 600, margin: 0 }}>{s.v}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ROI */}
-        <div className="fade-up" style={{ marginTop: 12, background: "#0f1a0f", border: "1px solid #1a2a1a", borderRadius: 10, padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, animationDelay: "0.1s" }}>
-          <span style={{ fontSize: 18 }}>{"\u{1F4B0}"}</span>
-          <p style={{ margin: 0, color: "#6ee7b7", fontSize: 13 }}>
-            <strong>InstallerOS costs {fmt(INSTALLEROS_COST)}/month.</strong> Jessica has captured {fmt(stats.rev)} in revenue that would have leaked - that's a <strong>{stats.roi.toFixed(1)}x return</strong> on your investment this period.
+        {/* ─── ROI CALLOUT ─── */}
+        <div className="fade-up" style={{ marginTop: 10, background: "rgba(0,212,170,0.04)", border: "1px solid rgba(0,212,170,0.1)", borderRadius: 10, padding: "12px 20px", display: "flex", alignItems: "center", gap: 12, animationDelay: "0.08s" }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--accent-dim)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ fontSize: 16 }}>{"\u{1F4B0}"}</span>
+          </div>
+          <p style={{ margin: 0, color: "var(--accent)", fontSize: 13, lineHeight: 1.5 }}>
+            <strong>InstallerOS costs {fmt(DEMO_MONTHLY_COST)}/month.</strong> {DEMO_AGENT_NAME} has captured {fmt(stats.rev)} in revenue that would have leaked - that's a <strong>{stats.roi.toFixed(1)}x return</strong> on investment this period.
           </p>
         </div>
 
-        {/* CAPTURE CARDS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, marginTop: 24 }}>
+        {/* ─── CAPTURE TYPE CARDS ─── */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10, marginTop: 20 }}>
           {Object.entries(CAPTURE_LABELS).map(([key, meta], i) => {
             const d = stats.byCap[key] || { count: 0, revenue: 0 };
+            const isHov = hovered === key;
             return (
-              <div key={key} className="card fade-up" style={{ background: hovered === key ? "#1a1a1a" : "#111", border: `1px solid ${hovered === key ? PIE_COLORS[i] + "44" : "#1a1a1a"}`, borderRadius: 12, padding: 20, cursor: "default", animationDelay: `${0.1 + i * 0.08}s` }} onMouseEnter={() => setHovered(key)} onMouseLeave={() => setHovered(null)}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                  <span style={{ fontSize: 22 }}>{meta.icon}</span>
-                  <span style={{ background: PIE_COLORS[i] + "18", color: PIE_COLORS[i], padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>{d.count} calls</span>
+              <div key={key} className="card fade-up" style={{ background: isHov ? "var(--bg-card-hover)" : "var(--bg-card)", borderColor: isHov ? PIE_HEX[i] + "33" : "var(--border)", borderRadius: 12, padding: "18px 20px", cursor: "default", animationDelay: `${0.1 + i * 0.06}s` }} onMouseEnter={() => setHovered(key)} onMouseLeave={() => setHovered(null)}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <span style={{ fontSize: 20 }}>{meta.icon}</span>
+                  <span style={{ background: PIE_HEX[i] + "15", color: PIE_HEX[i], padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, fontFamily: "var(--font-mono)" }}>{d.count}</span>
                 </div>
-                <p style={{ color: "#fff", fontSize: 12, fontWeight: 600, margin: "0 0 3px" }}>{meta.label}</p>
-                <p style={{ color: "#555", fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>{meta.desc}</p>
-                <p style={{ color: PIE_COLORS[i], fontSize: 24, fontWeight: 700, margin: 0, letterSpacing: -1 }}>{fmt(d.revenue)}</p>
+                <p style={{ color: "var(--text-primary)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{meta.label}</p>
+                <p style={{ color: "var(--text-muted)", fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>{meta.desc}</p>
+                <p style={{ color: PIE_HEX[i], fontSize: 24, fontWeight: 700, margin: 0, letterSpacing: -0.5, fontFamily: "var(--font-body)" }}>{fmt(d.revenue)}</p>
               </div>
             );
           })}
         </div>
 
-        {/* CHARTS */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 24 }}>
-          <div className="fade-up" style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: "20px 20px 12px", animationDelay: "0.3s" }}>
-            <h3 style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: "0 0 16px" }}>Daily Revenue Captured</h3>
+        {/* ─── CHARTS ROW ─── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 20 }}>
+          <div className="card fade-up" style={{ background: "var(--bg-card)", borderRadius: 12, padding: "20px 20px 12px", animationDelay: "0.3s" }}>
+            <h3 style={{ color: "var(--text-primary)", fontSize: 13, fontWeight: 600, margin: "0 0 16px" }}>Daily Revenue Captured</h3>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={stats.daily}>
-                <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f59e0b" stopOpacity={0.3} /><stop offset="100%" stopColor="#f59e0b" stopOpacity={0} /></linearGradient></defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" />
-                <XAxis dataKey="day" tick={{ fill: "#555", fontSize: 10 }} axisLine={{ stroke: "#1a1a1a" }} tickLine={false} />
-                <YAxis tick={{ fill: "#555", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => "\u00A3" + v} />
+                <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00d4aa" stopOpacity={0.25} /><stop offset="100%" stopColor="#00d4aa" stopOpacity={0} /></linearGradient></defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="day" tick={{ fill: "var(--text-muted)", fontSize: 10, fontFamily: "var(--font-mono)" }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                <YAxis tick={{ fill: "var(--text-muted)", fontSize: 10, fontFamily: "var(--font-mono)" }} axisLine={false} tickLine={false} tickFormatter={v => "\u00A3" + v} />
                 <Tooltip content={<CTip />} />
-                <Area type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2} fill="url(#rg)" name="Revenue" />
+                <Area type="monotone" dataKey="revenue" stroke="#00d4aa" strokeWidth={2} fill="url(#rg)" name="Revenue" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <div className="fade-up" style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: 20, animationDelay: "0.35s" }}>
-            <h3 style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: "0 0 10px" }}>Revenue by Capture Type</h3>
+          <div className="card fade-up" style={{ background: "var(--bg-card)", borderRadius: 12, padding: 20, animationDelay: "0.35s" }}>
+            <h3 style={{ color: "var(--text-primary)", fontSize: 13, fontWeight: 600, margin: "0 0 10px" }}>Revenue by Capture Type</h3>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <ResponsiveContainer width="50%" height={190}>
-                <PieChart><Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={78} paddingAngle={3} dataKey="value" stroke="none">{pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}</Pie><Tooltip content={<CTip />} /></PieChart>
+                <PieChart><Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={78} paddingAngle={3} dataKey="value" stroke="none">{pieData.map((_, i) => <Cell key={i} fill={PIE_HEX[i]} />)}</Pie><Tooltip content={<CTip />} /></PieChart>
               </ResponsiveContainer>
               <div style={{ flex: 1 }}>
                 {pieData.map((e, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
-                    <div style={{ width: 9, height: 9, borderRadius: 2, background: PIE_COLORS[i], flexShrink: 0 }} />
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: 2, background: PIE_HEX[i], flexShrink: 0 }} />
                     <div>
-                      <p style={{ color: "#ccc", fontSize: 12, margin: 0 }}>{e.name}</p>
-                      <p style={{ color: "#666", fontSize: 10, margin: 0 }}>{fmt(e.value)} \u00B7 {e.count} calls</p>
+                      <p style={{ color: "var(--text-secondary)", fontSize: 12, margin: 0 }}>{e.name}</p>
+                      <p style={{ color: "var(--text-muted)", fontSize: 10, margin: 0, fontFamily: "var(--font-mono)" }}>{fmt(e.value)} · {e.count} calls</p>
                     </div>
                   </div>
                 ))}
@@ -357,32 +518,34 @@ function RevenueDashboard() {
           </div>
         </div>
 
-        {/* BAR */}
-        <div className="fade-up" style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: "20px 20px 12px", marginTop: 12, animationDelay: "0.4s" }}>
-          <h3 style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: "0 0 16px" }}>Revenue by Job Type (Top 8)</h3>
+        {/* ─── BAR CHART ─── */}
+        <div className="card fade-up" style={{ background: "var(--bg-card)", borderRadius: 12, padding: "20px 20px 12px", marginTop: 10, animationDelay: "0.4s" }}>
+          <h3 style={{ color: "var(--text-primary)", fontSize: 13, fontWeight: 600, margin: "0 0 16px" }}>Revenue by Job Type (Top 8)</h3>
           <ResponsiveContainer width="100%" height={230}>
             <BarChart data={barData} layout="vertical" margin={{ left: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" horizontal={false} />
-              <XAxis type="number" tick={{ fill: "#555", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => "\u00A3" + v} />
-              <YAxis type="category" dataKey="name" tick={{ fill: "#999", fontSize: 11 }} axisLine={false} tickLine={false} width={140} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+              <XAxis type="number" tick={{ fill: "var(--text-muted)", fontSize: 10, fontFamily: "var(--font-mono)" }} axisLine={false} tickLine={false} tickFormatter={v => "\u00A3" + v} />
+              <YAxis type="category" dataKey="name" tick={{ fill: "var(--text-secondary)", fontSize: 11 }} axisLine={false} tickLine={false} width={150} />
               <Tooltip content={<CTip />} />
-              <Bar dataKey="revenue" fill="#f59e0b" radius={[0, 5, 5, 0]} name="Revenue" barSize={18} />
+              <Bar dataKey="revenue" fill="#00d4aa" radius={[0, 5, 5, 0]} name="Revenue" barSize={18} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* TABLE */}
-        <div className="fade-up" style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: 20, marginTop: 12, animationDelay: "0.45s" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h3 style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: 0 }}>Recent Captured Calls</h3>
-            <span style={{ color: "#555", fontSize: 11, fontFamily: "monospace" }}>{src === "live" ? "Live from Monday.com" : "Sample data"} \u00B7 Latest 15</span>
+        {/* ─── TABLE ─── */}
+        <div className="card fade-up" style={{ background: "var(--bg-card)", borderRadius: 12, padding: 20, marginTop: 10, animationDelay: "0.45s" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <h3 style={{ color: "var(--text-primary)", fontSize: 13, fontWeight: 600, margin: 0 }}>Recent Captured Calls</h3>
+            <span style={{ color: "var(--text-muted)", fontSize: 10, fontFamily: "var(--font-mono)", letterSpacing: 1 }}>
+              {src === "live" ? "LIVE" : "DEMO"} · LATEST 15
+            </span>
           </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 2px" }}>
               <thead>
                 <tr>
                   {["Date", "Time", "Customer", "Job Type", "Capture Reason", "Value", "Status"].map(th => (
-                    <th key={th} style={{ textAlign: "left", padding: "7px 10px", color: "#555", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace", borderBottom: "1px solid #1a1a1a" }}>{th}</th>
+                    <th key={th} style={{ textAlign: "left", padding: "7px 10px", color: "var(--text-muted)", fontSize: 9, fontWeight: 500, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "var(--font-mono)", borderBottom: "1px solid var(--border)" }}>{th}</th>
                   ))}
                 </tr>
               </thead>
@@ -393,27 +556,27 @@ function RevenueDashboard() {
                   return (
                     <Fragment key={call.id}>
                       <tr className="row" onClick={() => setExpanded(isEx ? null : call.id)} style={{ animation: `slideIn 0.3s ease-out ${i * 0.03}s forwards`, opacity: 0 }}>
-                        <td style={{ padding: "9px 10px", color: "#999", fontSize: 12 }}>{fmtD(call.date)}</td>
-                        <td style={{ padding: "9px 10px", color: "#999", fontSize: 12, fontFamily: "monospace" }}>{fmtT(call.date)}</td>
-                        <td style={{ padding: "9px 10px", color: "#ddd", fontSize: 12, fontWeight: 500 }}>{call.customerName}</td>
-                        <td style={{ padding: "9px 10px", color: "#ccc", fontSize: 12 }}>{call.jobType}</td>
+                        <td style={{ padding: "9px 10px", color: "var(--text-secondary)", fontSize: 12 }}>{fmtD(call.date)}</td>
+                        <td style={{ padding: "9px 10px", color: "var(--text-secondary)", fontSize: 12, fontFamily: "var(--font-mono)" }}>{fmtT(call.date)}</td>
+                        <td style={{ padding: "9px 10px", color: "var(--text-primary)", fontSize: 12, fontWeight: 500 }}>{call.customerName}</td>
+                        <td style={{ padding: "9px 10px", color: "var(--text-secondary)", fontSize: 12 }}>{call.jobType}</td>
                         <td style={{ padding: "9px 10px" }}>
-                          <span style={{ background: PIE_COLORS[ci] + "18", color: PIE_COLORS[ci], padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 500 }}>{CAPTURE_LABELS[call.captureType]?.label}</span>
+                          <span style={{ background: PIE_HEX[ci] + "15", color: PIE_HEX[ci], padding: "2px 9px", borderRadius: 20, fontSize: 11, fontWeight: 500 }}>{CAPTURE_LABELS[call.captureType]?.label}</span>
                         </td>
-                        <td style={{ padding: "9px 10px", color: "#f59e0b", fontSize: 13, fontWeight: 600, fontFamily: "monospace" }}>{fmt(call.estimatedValue)}</td>
+                        <td style={{ padding: "9px 10px", color: "var(--accent)", fontSize: 13, fontWeight: 600, fontFamily: "var(--font-mono)" }}>{fmt(call.estimatedValue)}</td>
                         <td style={{ padding: "9px 10px" }}>
-                          <span style={{ background: call.status === "booked" ? "#0f2a0f" : "#2a1a0f", color: call.status === "booked" ? "#22c55e" : "#f59e0b", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 500 }}>{call.status === "booked" ? "Booked" : "Pending"}</span>
+                          <span style={{ background: call.status === "booked" ? "rgba(0,212,170,0.08)" : "rgba(240,180,41,0.08)", color: call.status === "booked" ? "var(--accent)" : "var(--warning)", padding: "2px 9px", borderRadius: 20, fontSize: 11, fontWeight: 500 }}>{call.status === "booked" ? "Booked" : "Pending"}</span>
                         </td>
                       </tr>
                       {isEx && (
                         <tr style={{ animation: "fadeUp 0.3s ease-out" }}>
-                          <td colSpan={7} style={{ padding: "10px 20px 14px", background: "#0d0d0d", borderBottom: "1px solid #1a1a1a" }}>
+                          <td colSpan={7} style={{ padding: "10px 20px 14px", background: "rgba(0,0,0,0.3)", borderBottom: "1px solid var(--border)" }}>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
-                              {call.description && <div><p style={{ color: "#555", fontSize: 10, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace" }}>Description</p><p style={{ color: "#ccc", fontSize: 12, margin: 0, lineHeight: 1.5 }}>{call.description}</p></div>}
-                              {call.boilerType && <div><p style={{ color: "#555", fontSize: 10, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace" }}>Boiler Type</p><p style={{ color: "#ccc", fontSize: 12, margin: 0 }}>{call.boilerType}</p></div>}
-                              {call.callSource && <div><p style={{ color: "#555", fontSize: 10, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace" }}>Call Source</p><p style={{ color: "#ccc", fontSize: 12, margin: 0 }}>{call.callSource}</p></div>}
-                              {call.postcode && <div><p style={{ color: "#555", fontSize: 10, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace" }}>Postcode</p><p style={{ color: "#ccc", fontSize: 12, margin: 0 }}>{call.postcode}</p></div>}
-                              <div><p style={{ color: "#555", fontSize: 10, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1, fontFamily: "monospace" }}>Value Basis</p><p style={{ color: "#999", fontSize: 11, margin: 0, fontStyle: "italic" }}>Denver price list: "{call.jobType}" = {fmt((PRICE_MAP[call.jobType] || PRICE_MAP["General Enquiry"]).avg)} avg</p></div>
+                              {call.description && <div><p className="stat-label" style={{ marginBottom: 3 }}>Description</p><p style={{ color: "var(--text-secondary)", fontSize: 12, margin: 0, lineHeight: 1.5 }}>{call.description}</p></div>}
+                              {call.postcode && <div><p className="stat-label" style={{ marginBottom: 3 }}>Postcode</p><p style={{ color: "var(--text-secondary)", fontSize: 12, margin: 0 }}>{call.postcode}</p></div>}
+                              {call.phone && <div><p className="stat-label" style={{ marginBottom: 3 }}>Phone</p><p style={{ color: "var(--text-secondary)", fontSize: 12, margin: 0, fontFamily: "var(--font-mono)" }}>{call.phone}</p></div>}
+                              {call.callSource && <div><p className="stat-label" style={{ marginBottom: 3 }}>Source</p><p style={{ color: "var(--text-secondary)", fontSize: 12, margin: 0 }}>{call.callSource}</p></div>}
+                              <div><p className="stat-label" style={{ marginBottom: 3 }}>Value Basis</p><p style={{ color: "var(--text-muted)", fontSize: 11, margin: 0, fontStyle: "italic" }}>Price list: "{call.jobType}" = {fmt((PRICE_MAP[call.jobType] || PRICE_MAP["General Enquiry"]).avg)} avg</p></div>
                             </div>
                           </td>
                         </tr>
@@ -426,23 +589,32 @@ function RevenueDashboard() {
           </div>
         </div>
 
-        {/* NOTE */}
-        <div className="fade-up" style={{ marginTop: 12, background: "#111", border: "1px solid #1a1a1a", borderRadius: 10, padding: "14px 20px", animationDelay: "0.5s" }}>
-          <p style={{ color: "#444", fontSize: 11, margin: 0, lineHeight: 1.6 }}>
-            <strong style={{ color: "#555" }}>How values are calculated:</strong> Job types are inferred from the Description and Boiler Type fields on Monday.com. Revenue estimates use Denver Services' published price list (inc. VAT where standard). Capture types are determined by call timing and the Call Source field. Click any row to see source data.
+        {/* ─── METHODOLOGY NOTE ─── */}
+        <div className="fade-up" style={{ marginTop: 10, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 20px", animationDelay: "0.5s" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: 11, margin: 0, lineHeight: 1.6 }}>
+            <strong style={{ color: "var(--text-secondary)" }}>How values are calculated:</strong> Job types are inferred from call descriptions and matched against the company's published price list. Revenue estimates include VAT where standard. Capture types are determined by call timing and source data. Click any row to see source data.
           </p>
         </div>
 
-        <div style={{ marginTop: 28, padding: "16px 0", borderTop: "1px solid #1a1a1a", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-          <p style={{ color: "#333", fontSize: 11, margin: 0, fontFamily: "monospace" }}>Denver Services \u00B7 Revenue Generation Dashboard \u00B7 Powered by InstallerOS</p>
-          <p style={{ color: "#333", fontSize: 11, margin: 0, fontFamily: "monospace" }}>{src === "live" ? "Data source: Monday.com \u00B7 Live" : "Sample data \u00B7 Fallback mode"}</p>
+        {/* ─── FOOTER ─── */}
+        <div style={{ marginTop: 28, padding: "16px 0", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="logo-mark" style={{ fontSize: 12 }}>
+              <span style={{ width: 20, height: 20, fontSize: 10, borderRadius: 5 }}>iO</span>
+              <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>InstallerOS</span>
+            </div>
+            <span style={{ color: "var(--text-muted)", fontSize: 11, fontFamily: "var(--font-mono)" }}>· Revenue Intelligence · {DEMO_COMPANY}</span>
+          </div>
+          <p style={{ color: "var(--text-muted)", fontSize: 10, margin: 0, fontFamily: "var(--font-mono)", letterSpacing: 1 }}>
+            {src === "live" ? "LIVE DATA" : "DEMO MODE"}
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<RevenueDashboard />);
+ReactDOM.createRoot(document.getElementById("root")).render(<Dashboard />);
 </script>
 </body>
 </html>
